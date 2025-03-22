@@ -7,10 +7,16 @@ const Form2 = () => {
   const [user1, setUser1] = useState('');
   const [user2, setUser2] = useState('');
   const [query, setQuery] = useState('');
+  const [bothDirections, setBothDirections] = useState(false);
 
   const buildQuery = () => {
     if (user1 && user2) {
-      return `https://x.com/search?q=(from%3A${encodeURIComponent(user1)})%20(to%3A${encodeURIComponent(user2)})&src=typed_query`;
+      const query1 = `https://x.com/search?q=(from%3A${encodeURIComponent(user1)})%20(to%3A${encodeURIComponent(user2)})&src=typed_query`;
+      if (bothDirections) {
+        const query2 = `https://x.com/search?q=(from%3A${encodeURIComponent(user2)})%20(to%3A${encodeURIComponent(user1)})&src=typed_query`;
+        return `${query1} OR ${query2}`;
+      }
+      return query1;
     }
     return '';
   };
@@ -54,6 +60,18 @@ const Form2 = () => {
             />
           </div>
           <div className="mb-4">
+            <input
+              type="checkbox"
+              id="bothDirections"
+              checked={bothDirections}
+              onChange={(e) => setBothDirections(e.target.checked)}
+              className="mr-2"
+            />
+            <label htmlFor="bothDirections">
+              Create link for both directions
+            </label>
+          </div>
+          <div className="mb-4">
             <button
               type="submit"
               className="w-full p-2 bg-blue-600 text-white"
@@ -65,14 +83,36 @@ const Form2 = () => {
       </div>
       {query && (
         <div className="mt-4 break-words text-xs flex-wrap">
-          <Link
-            href={query}
-            target="_blank"
-            rel="noopener noreferrer"
-            className="text-blue-500 hover:text-blue-700 underline"
-          >
-            {query}
-          </Link>
+          {bothDirections ? (
+            <>
+              <Link
+                href={`https://x.com/search?q=(from%3A${encodeURIComponent(user1)})%20(to%3A${encodeURIComponent(user2)})&src=typed_query`}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="text-blue-500 hover:text-blue-700 underline"
+              >
+                {`search for tweets from ${user1} to ${user2}`}
+              </Link>
+              <br />
+              <Link
+                href={`https://x.com/search?q=(from%3A${encodeURIComponent(user2)})%20(to%3A${encodeURIComponent(user1)})&src=typed_query`}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="text-blue-500 hover:text-blue-700 underline"
+              >
+                {`search for tweets from ${user2} to ${user1}`}
+              </Link>
+            </>
+          ) : (
+            <Link
+              href={query}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="text-blue-500 hover:text-blue-700 underline"
+            >
+              {query}
+            </Link>
+          )}
         </div>
       )}
     </>
