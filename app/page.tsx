@@ -1,5 +1,5 @@
-import Image from "next/image";
 import Form from "../components/Form";
+import Form2 from "../components/Form2";
 
 export default function Home() {
   return (
@@ -11,6 +11,7 @@ export default function Home() {
         A tool to help you search for tweets on Twitter.
       </p>
       <Form />
+      <Form2 />
     </main>
   );
 }
