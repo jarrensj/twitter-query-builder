@@ -1,6 +1,6 @@
 'use client'
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import Link from 'next/link';
 
 const Form = () => {
@@ -8,11 +8,26 @@ const Form = () => {
   const [keywords, setKeywords] = useState(''); // all required keywords that must be found in the tweet
   const [query, setQuery] = useState('');
 
+  // Load handle from localStorage on component mount
+  useEffect(() => {
+    const savedHandle = localStorage.getItem('twitter-handle');
+    if (savedHandle) {
+      setHandle(savedHandle);
+    }
+  }, []);
+
+  // Save handle to localStorage whenever it changes
+  const handleHandleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const newHandle = e.target.value;
+    setHandle(newHandle);
+    localStorage.setItem('twitter-handle', newHandle);
+  };
+
   const buildQuery = () => {
     let queryParts = [];
 
     if (keywords) {
-      queryParts.push(keywords.split(' ').map(word => encodeURIComponent(word)).join('%20'));
+      queryParts.push(keywords.split(' ').map((word: string) => encodeURIComponent(word)).join('%20'));
     }
     if (handle) {
       queryParts.push(`from%3A${handle}`);
@@ -41,7 +56,7 @@ const Form = () => {
               type="text"
               id="handle"
               value={handle}
-              onChange={(e) => setHandle(e.target.value)}
+              onChange={handleHandleChange}
               className="border p-2 w-full"
               placeholder="jarrensj"
             />
@@ -54,7 +69,7 @@ const Form = () => {
               type="text"
               id="keywords"
               value={keywords}
-              onChange={(e) => setKeywords(e.target.value)}
+              onChange={(e: React.ChangeEvent<HTMLInputElement>) => setKeywords(e.target.value)}
               className="border p-2 w-full"
               placeholder="hi"
             />
