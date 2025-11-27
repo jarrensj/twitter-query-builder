@@ -98,7 +98,7 @@ const MonthlyTweetForm = () => {
               value={handle}
               onChange={handleHandleChange}
               className="border p-2 w-full rounded"
-              placeholder="twitter"
+              placeholder="jarrensj"
             />
           </div>
           
