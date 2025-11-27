@@ -8,6 +8,7 @@ const MonthlyTweetForm = () => {
   const [month, setMonth] = useState('');
   const [year, setYear] = useState('');
   const [query, setQuery] = useState('');
+  const [isLoading, setIsLoading] = useState(false);
 
   const months = [
     { value: '01', label: 'January' },
@@ -52,25 +53,28 @@ const MonthlyTweetForm = () => {
     return new Date(year, month, 0).getDate();
   };
 
-  const buildQuery = () => {
-    if (!handle || !month || !year) {
-      return '';
+  // Automatically update query when handle, month, or year changes
+  useEffect(() => {
+    if (handle && month && year) {
+      setIsLoading(true);
+      const timer = setTimeout(() => {
+        const yearNum = parseInt(year);
+        const monthNum = parseInt(month);
+        const daysInMonth = getDaysInMonth(yearNum, monthNum);
+
+        const sinceDate = `${year}-${month}-01`;
+        const untilDate = `${year}-${month}-${String(daysInMonth).padStart(2, '0')}`;
+
+        const newQuery = `https://x.com/search?q=from%3A${encodeURIComponent(handle)}%20since%3A${sinceDate}%20until%3A${untilDate}&src=typed_query&f=live`;
+        setQuery(newQuery);
+        setIsLoading(false);
+      }, 300);
+
+      return () => clearTimeout(timer);
+    } else {
+      setQuery('');
     }
-
-    const yearNum = parseInt(year);
-    const monthNum = parseInt(month);
-    const daysInMonth = getDaysInMonth(yearNum, monthNum);
-
-    const sinceDate = `${year}-${month}-01`;
-    const untilDate = `${year}-${month}-${String(daysInMonth).padStart(2, '0')}`;
-
-    return `https://x.com/search?q=from%3A${encodeURIComponent(handle)}%20since%3A${sinceDate}%20until%3A${untilDate}&src=typed_query&f=live`;
-  };
-
-  const handleSubmit = (e: React.FormEvent) => {
-    e.preventDefault();
-    setQuery(buildQuery());
-  };
+  }, [handle, month, year]);
 
   const getMonthName = (monthValue: string) => {
     const monthObj = months.find(m => m.value === monthValue);
@@ -83,7 +87,7 @@ const MonthlyTweetForm = () => {
         <h2 className="text-lg font-bold mb-4 text-center">
           Monthly Tweet Summary
         </h2>
-        <form onSubmit={handleSubmit} className="mb-4">
+        <div className="mb-4">
           <div className="mb-4">
             <label htmlFor="handle-monthly" className="block mb-2">
               Twitter Handle:
@@ -95,7 +99,6 @@ const MonthlyTweetForm = () => {
               onChange={handleHandleChange}
               className="border p-2 w-full rounded"
               placeholder="twitter"
-              required
             />
           </div>
           
@@ -109,7 +112,6 @@ const MonthlyTweetForm = () => {
                 value={month}
                 onChange={(e) => setMonth(e.target.value)}
                 className="border p-2 w-full rounded"
-                required
               >
                 <option value="">Select Month</option>
                 {months.map((m) => (
@@ -129,7 +131,6 @@ const MonthlyTweetForm = () => {
                 value={year}
                 onChange={(e) => setYear(e.target.value)}
                 className="border p-2 w-full rounded"
-                required
               >
                 <option value="">Select Year</option>
                 {years.map((y) => (
@@ -140,19 +141,19 @@ const MonthlyTweetForm = () => {
               </select>
             </div>
           </div>
-
-          <div className="mb-4">
-            <button
-              type="submit"
-              className="w-full p-2 bg-blue-600 text-white rounded hover:bg-blue-700 transition"
-            >
-              Generate Tweet Search
-            </button>
-          </div>
-        </form>
+        </div>
       </div>
       
-      {query && (
+      {isLoading && (
+        <div className="mt-4 w-full max-w-md">
+          <div className="bg-gray-100 p-4 rounded animate-pulse">
+            <div className="h-4 bg-gray-300 rounded w-3/4 mb-2"></div>
+            <div className="h-3 bg-gray-300 rounded w-1/2"></div>
+          </div>
+        </div>
+      )}
+      
+      {!isLoading && query && (
         <div className="mt-4 w-full max-w-md">
           <div className="bg-gray-100 p-4 rounded">
             <p className="mb-2 font-semibold">
