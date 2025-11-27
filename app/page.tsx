@@ -1,5 +1,6 @@
 import Form from "../components/Form";
 import Form2 from "../components/Form2";
+import MonthlyTweetForm from "../components/MonthlyTweetForm";
 
 export default function Home() {
   return (
@@ -10,6 +11,8 @@ export default function Home() {
       <p className="text-center">
         A tool to help you search for tweets on Twitter.
       </p>
+      <MonthlyTweetForm />
+      <div className="border-t border-gray-300 w-full max-w-md my-8"></div>
       <Form />
       <Form2 />
     </main>
